@@ -114,7 +114,12 @@ const app = {
         today.setHours(0, 0, 0, 0);
         const q = query(collection(db, "orders"), where("uid", "==", appState.currentUser.uid), where("createdAt", ">=", today));
         onSnapshot(q, (snapshot) => {
-            appState.orders = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a, b) => b.createdAt.toDate() - a.createdAt.toDate());
+            appState.orders = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()})).sort((a, b) => {
+                // Handle both server timestamps and local dates
+                const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : a.createdAt;
+                const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : b.createdAt;
+                return dateB - dateA;
+            });
             this.renderOrders();
         });
     },
@@ -123,7 +128,6 @@ const app = {
     animateAndPlaceOrder() {
         if (appState.cart.length === 0) return;
 
-        // Animate the burger button exactly as requested
         const burger = ui.buyNowBurger;
         const tomato = burger.querySelector('.tomato');
         
@@ -133,64 +137,39 @@ const app = {
         setTimeout(() => tomato.classList.remove('tap-bounce'), 400);
         setTimeout(() => burger.classList.remove('show'), 2500);
 
-        // Immediately run the payment success logic
         this.handleSuccessfulPayment();
     },
 
+    // THIS IS THE CLEAN, CORRECTED VERSION OF THE FUNCTION
     async handleSuccessfulPayment() {
-  const eatingMode = document.querySelector('input[name="eatingMode"]:checked').value;
-  const batch = writeBatch(db);
+        const eatingMode = document.querySelector('input[name="eatingMode"]:checked').value;
+        const batch = writeBatch(db);
 
-  const ordersByCanteen = appState.cart.reduce((acc, item) => {
-    acc[item.canteenId] = acc[item.canteenId] || [];
-    acc[item.canteenId].push(item);
-    return acc;
-  }, {});
+        const ordersByCanteen = appState.cart.reduce((acc, item) => {
+            acc[item.canteenId] = acc[item.canteenId] || [];
+            acc[item.canteenId].push(item);
+            return acc;
+        }, {});
 
-  for (const canteenId in ordersByCanteen) {
-    const orderRef = doc(collection(db, "orders"));
-    const itemsForCanteen = ordersByCanteen[canteenId];
-    const canteenTotal = itemsForCanteen.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        for (const canteenId in ordersByCanteen) {
+            const orderRef = doc(collection(db, "orders"));
+            const itemsForCanteen = ordersByCanteen[canteenId];
+            const canteenTotal = itemsForCanteen.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-    batch.set(orderRef, {
-      uid: appState.currentUser.uid,
-      userId: appState.currentUser.userId,
-      canteenId,
-      items: itemsForCanteen,
-      total: canteenTotal,
-      eatingMode,
-      status: 'Paid',
-      createdAt: serverTimestamp(),
-    });
-  }
+            batch.set(orderRef, {
+                uid: appState.currentUser.uid,
+                userId: appState.currentUser.userId,
+                canteenId: canteenId,
+                items: itemsForCanteen,
+                total: canteenTotal,
+                eatingMode: eatingMode,
+                status: 'Paid',
+                createdAt: new Date(), // Using app's clock to ensure it appears instantly
+            });
+        }
 
-  await batch.commit();
-
-  appState.cart = [];
-  this.renderCart();
-  this.showToast('Order Placed Successfully!');
-  this.showPage('ordersPage');
-},
-
-  await batch.commit();
-
-  appState.cart = [];
-  this.renderCart();
-  this.showToast('Order Placed Successfully!');
-  this.showPage('ordersPage');
-}
-
-        
         await batch.commit();
-        
-        appState.cart = [];
-        this.renderCart();
-        this.showToast('Order Placed Successfully!');
-        this.showPage('ordersPage');
-    },
-        
-        await batch.commit();
-        
+
         appState.cart = [];
         this.renderCart();
         this.showToast('Order Placed Successfully!');
