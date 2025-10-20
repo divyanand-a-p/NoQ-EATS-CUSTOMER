@@ -159,10 +159,18 @@ const app = {
                 items: itemsForCanteen,
                 total: canteenTotal,
                 eatingMode,
-                status: 'Paid', // This triggers the first tick!
-                createdAt: serverTimestamp(),
+                status: 'Paid',
+                createdAt: new Date(), // <-- THIS IS THE FIX
             });
         }
+        
+        await batch.commit();
+        
+        appState.cart = [];
+        this.renderCart();
+        this.showToast('Order Placed Successfully!');
+        this.showPage('ordersPage');
+    },
         
         await batch.commit();
         
