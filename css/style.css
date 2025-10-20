@@ -48,7 +48,7 @@ body { background-color: var(--color-background); color: var(--color-text-light)
 .add-cart-btn svg { width: 16px; height: 16px; }
 
 /* --- PAGE/VIEW SPECIFIC STYLES --- */
-#ftArenaView .coming-soon { text-align: center; font-size: 2rem; color: var(--color-text-secondary); margin-top: 4rem; }
+.coming-soon { text-align: center; font-size: 2rem; color: var(--color-text-secondary); margin-top: 4rem; }
 .dish-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 .canteen-list { display: flex; flex-direction: column; gap: 1rem; }
 .canteen-card { border-radius: 12px; overflow: hidden; position: relative; cursor: pointer; background-color: var(--color-surface); }
@@ -56,26 +56,10 @@ body { background-color: var(--color-background); color: var(--color-text-light)
 .canteen-info { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding: 1.5rem 1rem 0.75rem; color: white; font-weight: 700; }
 .status-tag { position: absolute; top: 10px; right: 10px; background-color: var(--color-green-status); color: white; font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 6px; }
 .status-tag.closed { background-color: var(--color-primary); }
-.active-orders-tag { position: absolute; bottom: 10px; right: 10px; background-color: rgba(0,0,0,0.7); color: white; font-size: 0.8rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 6px; }
-.filter-section { border-bottom: 1px solid var(--color-surface-light); padding-bottom: 1.5rem; }
-.filter-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.75rem; }
-.filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-.filter-grid label, .checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
-.veg-filter-toggle { background-color: var(--color-surface); border-radius: 8px; padding: 0.5rem; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
-.switch { position: relative; display: inline-block; width: 60px; height: 34px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.switch .slider { position: absolute; cursor: pointer; inset: 0; background-color: var(--color-surface-light); border-radius: 34px; transition: .4s; }
-.switch .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; border-radius: 50%; transition: .4s; }
-.switch input:checked + .slider { background-color: var(--color-primary); }
-.switch input:checked + .slider:before { transform: translateX(26px); }
-.category-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; }
-.category-btn { background-color: var(--color-surface-light); color: white; border: none; padding: 0.6rem 1rem; border-radius: 8px; cursor: pointer; }
-.category-btn.active { background-color: var(--color-primary); }
-.filter-results-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding-top: 1rem; }
 #dishDetailHeader img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; }
 #dishDetailHeader h2 { font-size: 1.5rem; font-weight: 700; margin: 1rem 0; text-align: center; }
 .canteen-price-list { display: flex; flex-direction: column; gap: 0.5rem; }
-.canteen-price-item { display: flex; justify-content: space-between; align-items: center; background-color: var(--color-surface); padding: 0.75rem; border-radius: 8px; }
+.canteen-price-item { display: flex; justify-content: space-between; align-items: center; background-color: var(--color-surface); padding: 0.75rem; border-radius: 8px; cursor: pointer;}
 .cart-items-container { max-height: 40vh; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; }
 .cart-item { display: flex; gap: 1rem; }
 .cart-item img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; }
@@ -86,7 +70,7 @@ body { background-color: var(--color-background); color: var(--color-text-light)
 .quantity-stepper { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
 .quantity-btn { background-color: var(--color-surface-light); border: none; color: white; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; }
 .cart-section { border-top: 1px solid var(--color-surface-light); padding-top: 1.5rem; }
-.eating-mode-options { display: flex; gap: 1.5rem; }
+.eating-mode-options, .checkbox-label { display: flex; gap: 0.5rem; align-items: center;}
 #paymentSummary { font-size: 0.9rem; line-height: 1.6; }
 .payment-item { display: flex; justify-content: space-between; }
 .payment-item.total { font-weight: 700; font-size: 1.1rem; margin-top: 1rem; }
@@ -109,12 +93,11 @@ body { background-color: var(--color-background); color: var(--color-text-light)
 .tick.active { background-color: var(--color-green-status); color: white; }
 .order-footer { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--color-surface-light); text-align: center; }
 .btn-complete { background-color: var(--color-accent); color: black; border: none; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: 700; cursor: pointer; }
-.btn-complete.hidden { display: none; }
 .completed-text { color: var(--color-green-status); font-weight: 700; }
 .toast { position: fixed; bottom: 85px; left: 50%; transform: translate(-50%, 10px); background-color: var(--color-accent); color: black; padding: 0.75rem 1.5rem; border-radius: 9999px; font-weight: 600; z-index: 250; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-/* --- BURGER BUTTON STYLES --- */
+/* --- BURGER BUTTON STYLES (Your Code) --- */
 .buy-now-wrapper { display: flex; justify-content: center; align-items: center; margin-top: 1.5rem; }
 .burger { position: relative; width: 80px; height: 60px; cursor: pointer; }
 .burger .part { position: absolute; left: 50%; transform: translateX(-50%); opacity: 0; transition: transform 0.4s ease, opacity 0.4s ease; }
@@ -124,13 +107,10 @@ body { background-color: var(--color-background); color: var(--color-text-light)
 .burger .patty { width: 60px; height: 8px; background: #8d5524; border-radius: 4px; top: 46px; z-index: 2; }
 .burger .bottom-bun { width: 70px; height: 16px; background: #f4a261; border-radius: 15px 15px 35px 35px; top: 56px; z-index: 1; }
 .burger.show .part { opacity: 1; }
-.burger.show .top-bun { transform: translate(-50%, 0); }
-.burger.show .lettuce { transform: translate(-50%, 0); }
-.burger.show .patty { transform: translate(-50%, 0); }
-.burger.show .bottom-bun { transform: translate(-50%, 0); }
 .burger .top-bun { transform: translate(-50%, -50px); }
 .burger .lettuce { transform: translate(-50%, -30px); }
 .burger .patty { transform: translate(-50%, -10px); }
 .burger .bottom-bun { transform: translate(-50%, 20px); }
+.burger.show .top-bun, .burger.show .lettuce, .burger.show .patty, .burger.show .bottom-bun { transform: translate(-50%, 0); }
 @keyframes tapBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 .burger .tomato.tap-bounce { animation: tapBounce 0.4s ease; }
