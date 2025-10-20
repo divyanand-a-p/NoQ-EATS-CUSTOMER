@@ -44,12 +44,12 @@ const app = {
     init() {
         this.setupEventListeners();
         this.handleAuthState();
-        this.animateBurgerButton(); // Initialize the burger animation logic
     },
 
     setupEventListeners() {
         ui.loginBtn.addEventListener('click', this.signIn);
         ui.logoutBtn.addEventListener('click', this.signOut);
+        ui.buyNowBurger.addEventListener('click', () => this.animateAndPlaceOrder());
         ui.bottomNavItems.forEach(item => {
             item.addEventListener('click', () => this.switchView(item.dataset.view));
         });
@@ -118,66 +118,58 @@ const app = {
             this.renderOrders();
         });
     },
-
-    placeOrder() {
+    
+    // --- MOCK PAYMENT & ORDER PLACEMENT ---
+    animateAndPlaceOrder() {
         if (appState.cart.length === 0) return;
+
+        // Animate the burger button exactly as requested
+        const burger = ui.buyNowBurger;
+        const tomato = burger.querySelector('.tomato');
         
-        const subtotal = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const total = subtotal + 7; // Subtotal + fees
+        burger.classList.add('show');
+        tomato.classList.add('tap-bounce');
+        
+        setTimeout(() => tomato.classList.remove('tap-bounce'), 400);
+        setTimeout(() => burger.classList.remove('show'), 2500);
+
+        // Immediately run the payment success logic
+        this.handleSuccessfulPayment();
+    },
+
+    async handleSuccessfulPayment() {
         const eatingMode = document.querySelector('input[name="eatingMode"]:checked').value;
+        const batch = writeBatch(db);
+        
+        const ordersByCanteen = appState.cart.reduce((acc, item) => {
+            acc[item.canteenId] = acc[item.canteenId] || [];
+            acc[item.canteenId].push(item);
+            return acc;
+        }, {});
 
-        const options = {
-            key: "YOUR_RAZORPAY_KEY_ID", // IMPORTANT: Add your Razorpay Key ID here!
-            amount: total * 100,
-            currency: "INR",
-            name: "NoQ-EATS",
-            description: "Food Order Payment",
-            handler: async (response) => {
-                // This code runs ONLY after a successful payment
-                const batch = writeBatch(db);
-                const ordersByCanteen = appState.cart.reduce((acc, item) => {
-                    acc[item.canteenId] = acc[item.canteenId] || [];
-                    acc[item.canteenId].push(item);
-                    return acc;
-                }, {});
-
-                for (const canteenId in ordersByCanteen) {
-                    const orderRef = doc(collection(db, "orders"));
-                    const itemsForCanteen = ordersByCanteen[canteenId];
-                    const canteenTotal = itemsForCanteen.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                    
-                    batch.set(orderRef, {
-                        uid: appState.currentUser.uid,
-                        userId: appState.currentUser.userId,
-                        canteenId: canteenId,
-                        items: itemsForCanteen,
-                        total: canteenTotal,
-                        eatingMode,
-                        status: 'Paid', // First tick is set here
-                        createdAt: serverTimestamp(),
-                        razorpay_payment_id: response.razorpay_payment_id,
-                    });
-                }
-                
-                await batch.commit();
-                
-                appState.cart = [];
-                this.renderCart();
-                this.showToast('Order Placed Successfully!');
-                this.showPage('ordersPage');
-            },
-            prefill: {
-                name: appState.currentUser.name,
-                email: appState.currentUser.email,
-            },
-            theme: { color: "#c23e23" }
-        };
-        const rzp1 = new Razorpay(options);
-        rzp1.on('payment.failed', function (response){
-                alert("Payment failed. Please try again.");
-                console.error(response);
-        });
-        rzp1.open();
+        for (const canteenId in ordersByCanteen) {
+            const orderRef = doc(collection(db, "orders"));
+            const itemsForCanteen = ordersByCanteen[canteenId];
+            const canteenTotal = itemsForCanteen.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            batch.set(orderRef, {
+                uid: appState.currentUser.uid,
+                userId: appState.currentUser.userId,
+                canteenId: canteenId,
+                items: itemsForCanteen,
+                total: canteenTotal,
+                eatingMode,
+                status: 'Paid', // This triggers the first tick!
+                createdAt: serverTimestamp(),
+            });
+        }
+        
+        await batch.commit();
+        
+        appState.cart = [];
+        this.renderCart();
+        this.showToast('Order Placed Successfully!');
+        this.showPage('ordersPage');
     },
 
     renderAll() { this.renderCanteenList(); },
@@ -197,19 +189,6 @@ const app = {
     toggleSideNav() { /* ... function code (no changes) ... */ },
     closeSideNav() { /* ... function code (no changes) ... */ },
     showToast(message) { /* ... function code (no changes) ... */ },
-    
-    // Original burger animation logic
-    animateBurgerButton() {
-        ui.buyNowBurger.classList.add('show'); // Initial animation to show the button
-        ui.buyNowBurger.onclick = () => {
-            const tomato = ui.buyNowBurger.querySelector('.tomato');
-            tomato.classList.add('tap-bounce');
-            setTimeout(() => tomato.classList.remove('tap-bounce'), 400);
-
-            // This now calls the real Razorpay function
-            this.placeOrder(); 
-        };
-    }
 };
 
 // --- HELPER FUNCTIONS (No changes needed) ---
@@ -243,8 +222,8 @@ app.showDishDetails = function(dishName) {
     sameDishes.forEach(dish => {
         const item = document.createElement('div');
         item.className = 'canteen-price-item';
-        item.innerHTML = `<span>${dish.canteenName}</span><span>₹${dish.price}</span>`;
-        item.onclick = () => this.addToCart(dish);
+        item.innerHTML = `<span>${dish.canteenName}</span><button class="add-cart-btn">₹${dish.price} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg></button>`;
+        item.querySelector('.add-cart-btn').onclick = () => this.addToCart(dish);
         ui.dishDetailCanteenList.appendChild(item);
     });
     this.showPage('dishDetailsPage');
