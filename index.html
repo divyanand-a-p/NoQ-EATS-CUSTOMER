@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoQ-EATS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="loginPage" class="page active">
+        <div class="login-container">
+            <h1>Hi! Welcome</h1>
+            <p>Your Food is Waiting to be taken</p>
+            <button id="loginBtn" class="btn-primary">sign-in with Google</button>
+        </div>
+    </div>
+
+    <div id="appContainer" class="page">
+        <header id="mainHeader" class="main-header">
+            <button class="hamburger-btn" onclick="app.toggleSideNav()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <span class="header-title">NoQ-EATS</span>
+            <button class="cart-btn" onclick="app.showPage('cartPage')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <span id="cartCount" class="cart-count">0</span>
+            </button>
+        </header>
+
+        <nav id="sideNav" class="side-nav">
+            <div class="nav-header">
+                <span id="userName">Your Name</span>
+            </div>
+            <ul>
+                <li><a href="#" onclick="app.showPage('mainPage'); app.switchView('ftArenaView');">HOME</a></li>
+                <li><a href="#" onclick="app.showPage('cartPage')">CART</a></li>
+                <li><a href="#" onclick="app.showPage('ordersPage')">ORDERS</a></li>
+                <li><a href="https://forms.google.com" target="_blank">FEEDBACKS/GIVE US IDEAS</a></li>
+                <li><a href="https://forms.google.com" target="_blank">REPORTS/COMPLIANTS</a></li>
+            </ul>
+            <div class="nav-footer">
+                <button id="logoutBtn" class="btn-logout">LOG OUT</button>
+            </div>
+        </nav>
+        <div id="navOverlay" class="nav-overlay" onclick="app.toggleSideNav()"></div>
+
+        <div id="appContent" class="content-container">
+            <div id="mainPage" class="page active">
+                <div id="ftArenaView" class="view active">
+                    <h1 class="coming-soon">Coming Soon</h1>
+                </div>
+
+                <div id="placeView" class="view">
+                    <h2 class="view-title">Find the Hotel Name</h2>
+                    <div id="canteenList" class="canteen-list"></div>
+                </div>
+
+                <div id="filterView" class="view">
+                    <div class="filter-section">
+                        <h3 class="filter-title">PRICE-RANGE FILTER</h3>
+                        <div id="priceFilters" class="filter-grid"></div>
+                    </div>
+                    <div class="filter-section">
+                        <div class="veg-filter-toggle">
+                            <span>ALL ITEMS</span>
+                            <label class="switch"><input type="checkbox" id="vegOnlyToggle"><span class="slider"></span></label>
+                            <span>PURE VEG</span>
+                        </div>
+                    </div>
+                    <div class="filter-section">
+                        <h3 class="filter-title">CATEGORY</h3>
+                        <div id="categoryFilters" class="category-grid"></div>
+                    </div>
+                    <div id="filterResults" class="filter-results-grid"></div>
+                </div>
+
+                <nav class="bottom-nav">
+                    <ul>
+                        <li class="nav-item active" data-view="ftArenaView">FT.</li>
+                        <li class="nav-item" data-view="placeView">PLACE</li>
+                        <li class="nav-item" data-view="filterView">FILTER</li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div id="canteenMenuPage" class="page">
+                <button class="btn-back" onclick="app.showPage('mainPage'); app.switchView('placeView')">BACK</button>
+                <div id="canteenMenuHeader" class="canteen-menu-header"></div>
+                <div id="canteenMenuItems" class="dish-grid"></div>
+            </div>
+
+            <div id="dishDetailsPage" class="page">
+                <button class="btn-back" onclick="app.goBack()">BACK</button>
+                <div id="dishDetailHeader"></div>
+                <div id="dishDetailCanteenList" class="canteen-price-list"></div>
+            </div>
+
+            <div id="cartPage" class="page">
+                <h2 class="page-title">CART</h2>
+                <div id="cartItemsContainer" class="cart-items-container"></div>
+                <div class="cart-section">
+                    <h3 class="section-title">EATING MODE</h3>
+                    <div class="eating-mode-options">
+                        <label class="checkbox-label"><input type="radio" name="eatingMode" value="takeaway" checked> TAKE AWAY</label>
+                        <label class="checkbox-label"><input type="radio" name="eatingMode" value="parcel"> PARCEL</label>
+                    </div>
+                </div>
+                <div class="cart-section">
+                    <h3 class="section-title">PAYMENTS</h3>
+                    <div id="paymentSummary"></div>
+                </div>
+                <div class="buy-now-wrapper">
+                    <div id="buyNowBurger" class="burger">
+                        <div class="part top-bun"></div>
+                        <div class="part lettuce"></div>
+                        <div class="tomato">BUY NOW</div>
+                        <div class="part patty"></div>
+                        <div class="part bottom-bun"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="ordersPage" class="page">
+                <div class="orders-header">
+                    <h2 class="page-title">ORDERS</h2>
+                    <span id="orderDate" class="order-date"></span>
+                </div>
+                <div id="currentOrdersContainer"></div>
+                <div id="pastOrdersContainer"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="js/firebase-init.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
