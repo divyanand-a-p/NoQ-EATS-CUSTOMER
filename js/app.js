@@ -138,31 +138,40 @@ const app = {
     },
 
     async handleSuccessfulPayment() {
-        const eatingMode = document.querySelector('input[name="eatingMode"]:checked').value;
-        const batch = writeBatch(db);
-        
-        const ordersByCanteen = appState.cart.reduce((acc, item) => {
-            acc[item.canteenId] = acc[item.canteenId] || [];
-            acc[item.canteenId].push(item);
-            return acc;
-        }, {});
+  const eatingMode = document.querySelector('input[name="eatingMode"]:checked').value;
+  const batch = writeBatch(db);
+  
+  const ordersByCanteen = appState.cart.reduce((acc, item) => {
+    acc[item.canteenId] = acc[item.canteenId] || [];
+    acc[item.canteenId].push(item);
+    return acc;
+  }, {});
 
-        for (const canteenId in ordersByCanteen) {
-            const orderRef = doc(collection(db, "orders"));
-            const itemsForCanteen = ordersByCanteen[canteenId];
-            const canteenTotal = itemsForCanteen.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            
-            batch.set(orderRef, {
-                uid: appState.currentUser.uid,
-                userId: appState.currentUser.userId,
-                canteenId: canteenId,
-                items: itemsForCanteen,
-                total: canteenTotal,
-                eatingMode,
-                status: 'Paid',
-                createdAt: new Date(), // <-- THIS IS THE FIX
-            });
-        }
+  for (const canteenId in ordersByCanteen) {
+    const orderRef = doc(collection(db, "orders"));
+    const itemsForCanteen = ordersByCanteen[canteenId];
+    const canteenTotal = itemsForCanteen.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    batch.set(orderRef, {
+      uid: appState.currentUser.uid,
+      userId: appState.currentUser.userId,
+      canteenId,
+      items: itemsForCanteen,
+      total: canteenTotal,
+      eatingMode,
+      status: 'Paid',
+      createdAt: new Date(),
+    });
+  }
+
+  await batch.commit();
+
+  appState.cart = [];
+  this.renderCart();
+  this.showToast('Order Placed Successfully!');
+  this.showPage('ordersPage');
+}
+
         
         await batch.commit();
         
